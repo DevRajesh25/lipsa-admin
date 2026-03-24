@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Admin User - Firebase</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #FF6B35;
+            margin-bottom: 10px;
+        }
+        .uid-box {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            border-left: 4px solid #FF6B35;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .button {
+            display: inline-block;
+            background: #FF6B35;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .button:hover {
+            background: #e55a2b;
+        }
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .field-table th,
+        .field-table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .field-table th {
+            background: #FF6B35;
+            color: white;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Setup Admin User</h1>
+        <p>Follow these steps to create your admin account in Firebase Firestore.</p>
+
+        <div class="uid-box">
+            <strong>Your User UID:</strong><br>
+            <span style="font-size: 16px;">6UEfM5O4WNgUBWKSw38hsdVtaah1</span>
+        </div>
+
+        <div class="step">
+            <h3>Step 1: Open Firebase Console</h3>
+            <p>Click the button below to open your Firebase Firestore Database:</p>
+            <a href="https://console.firebase.google.com/project/lipsa-aec23/firestore" target="_blank" class="button">
+                Open Firebase Firestore →
+            </a>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Create User Document</h3>
+            <ol>
+                <li>In Firestore, look for the <strong>"users"</strong> collection
+                    <ul>
+                        <li>If it exists, click on it</li>
+                        <li>If not, click <strong>"Start collection"</strong> and name it <code>users</code></li>
+                    </ul>
+                </li>
+                <li>Click <strong>"Add document"</strong></li>
+                <li>In the <strong>"Document ID"</strong> field, paste this exactly:
+                    <div class="uid-box" style="margin: 10px 0;">
+                        6UEfM5O4WNgUBWKSw38hsdVtaah1
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Add Fields</h3>
+            <p>Add these 5 fields to the document:</p>
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>name</code></td>
+                        <td>string</td>
+                        <td>Admin User</td>
+                    </tr>
+                    <tr>
+                        <td><code>email</code></td>
+                        <td>string</td>
+                        <td><strong>Your login email</strong></td>
+                    </tr>
+                    <tr>
+                        <td><code>role</code></td>
+                        <td>string</td>
+                        <td><strong>admin</strong> (lowercase!)</td>
+                    </tr>
+                    <tr>
+                        <td><code>isBlocked</code></td>
+                        <td>boolean</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td><code>createdAt</code></td>
+                        <td>timestamp</td>
+                        <td>Click "Set to current time"</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Important:</strong>
+            <ul style="margin: 10px 0;">
+                <li>Document ID must be exactly: <code>6UEfM5O4WNgUBWKSw38hsdVtaah1</code></li>
+                <li>The <code>role</code> field must be exactly: <code>admin</code> (lowercase, no spaces)</li>
+                <li>Don't click "Auto-ID" - paste the UID manually</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Save & Test</h3>
+            <ol>
+                <li>Click <strong>"Save"</strong> in Firebase Console</li>
+                <li>Clear your browser cache (Ctrl+Shift+Delete)</li>
+                <li>Go to your login page: <a href="http://localhost:3000/login" target="_blank">http://localhost:3000/login</a></li>
+                <li>Login with your email and password</li>
+            </ol>
+        </div>
+
+        <div class="success">
+            <strong>✅ Success!</strong><br>
+            After completing these steps, you should be able to access the admin dashboard without any "Access denied" errors.
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="https://console.firebase.google.com/project/lipsa-aec23/firestore" target="_blank">Firebase Firestore Database</a></li>
+                <li><a href="https://console.firebase.google.com/project/lipsa-aec23/authentication/users" target="_blank">Firebase Authentication Users</a></li>
+                <li><a href="http://localhost:3000/login" target="_blank">Your Login Page</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

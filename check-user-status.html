@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check User Status</title>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjaSfVpgSpOG5ZnaRUawafzpH6mxHzQhU",
+            authDomain: "lipsa-aec23.firebaseapp.com",
+            projectId: "lipsa-aec23",
+            storageBucket: "lipsa-aec23.firebasestorage.app",
+            messagingSenderId: "15009459385",
+            appId: "1:15009459385:web:76fea985b4d0ae26e6bf68",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function updateStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.style.color = isError ? 'red' : 'green';
+        }
+
+        async function makeUserAdmin(uid, email, name) {
+            try {
+                await setDoc(doc(db, 'users', uid), {
+                    name: name || 'Admin User',
+                    email: email,
+                    role: 'admin',
+                    isBlocked: false,
+                    createdAt: serverTimestamp(),
+                }, { merge: true });
+                
+                updateStatus(`✅ User ${email} is now an admin! Please refresh your app.`);
+            } catch (error) {
+                updateStatus(`❌ Error making user admin: ${error.message}`, true);
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                updateStatus(`🔍 Checking user: ${user.email} (${user.uid})`);
+                
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        updateStatus(`
+                            <h3>Current User Status:</h3>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>UID:</strong> ${user.uid}</p>
+                            <p><strong>Name:</strong> ${userData.name}</p>
+                            <p><strong>Role:</strong> ${userData.role}</p>
+                            <p><strong>Is Admin:</strong> ${userData.role === 'admin' ? '✅ YES' : '❌ NO'}</p>
+                            <p><strong>Is Blocked:</strong> ${userData.isBlocked ? '🚫 YES' : '✅ NO'}</p>
+                            
+                            ${userData.role !== 'admin' ? `
+                                <button onclick="makeAdmin('${user.uid}', '${user.email}', '${userData.name || 'Admin User'}')">
+                                    Make This User Admin
+                                </button>
+                            ` : '<p style="color: green;">✅ You are already an admin!</p>'}
+                        `);
+                    } else {
+                        updateStatus(`
+                            <h3>User Document Not Found</h3>
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>UID:</strong> ${user.uid}</p>
+                            <p>No user document exists in Firestore.</p>
+                            <button onclick="makeAdmin('${user.uid}', '${user.email}', 'Admin User')">
+                                Create Admin User Document
+                            </button>
+                        `);
+                    }
+                } catch (error) {
+                    updateStatus(`❌ Error checking user: ${error.message}`, true);
+                }
+            } else {
+                updateStatus('❌ No user is currently logged in. Please log in to your app first.', true);
+            }
+        });
+
+        // Make function global
+        window.makeAdmin = makeUserAdmin;
+    </script>
+</head>
+<body>
+    <h1>Firebase User Status Checker</h1>
+    <p>This tool checks your current Firebase user status and can make you an admin.</p>
+    <div id="status">Loading...</div>
+</body>
+</html>
