@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import TopBar from '@/components/admin/TopBar';
 import Toast from '@/components/admin/Toast';
@@ -75,11 +75,32 @@ export default function SettingsPage() {
 
   // Save all settings to Firestore
   const handleSave = async () => {
+    // Validation
+    if (commissionSettings.commissionPercentage < 0 || commissionSettings.commissionPercentage > 100) {
+      showToast('Commission must be between 0 and 100', 'error');
+      return;
+    }
+
+    if (platformSettings.taxRate < 0 || platformSettings.taxRate > 100) {
+      showToast('Tax rate must be between 0 and 100', 'error');
+      return;
+    }
+
+    if (platformSettings.minOrderAmount < 0) {
+      showToast('Minimum order amount cannot be negative', 'error');
+      return;
+    }
+
+    if (platformSettings.maxOrderAmount < platformSettings.minOrderAmount) {
+      showToast('Maximum order amount must be greater than minimum', 'error');
+      return;
+    }
+
     try {
       setSaving(true);
 
-      // Update platform settings
-      await updateDoc(doc(db, 'settings', 'platform'), {
+      // Update platform settings (use setDoc with merge to create if not exists)
+      await setDoc(doc(db, 'settings', 'platform'), {
         currency: platformSettings.currency,
         taxRate: platformSettings.taxRate,
         minOrderAmount: platformSettings.minOrderAmount,
@@ -87,19 +108,22 @@ export default function SettingsPage() {
         maintenanceMode: platformSettings.maintenanceMode,
         vendorRegistrationEnabled: platformSettings.vendorRegistrationEnabled,
         productApprovalRequired: platformSettings.productApprovalRequired,
-      });
+        updatedAt: new Date(),
+      }, { merge: true });
 
-      // Update commission settings
-      await updateDoc(doc(db, 'settings', 'commission'), {
+      // Update commission settings (use setDoc with merge to create if not exists)
+      await setDoc(doc(db, 'settings', 'commission'), {
         commissionPercentage: commissionSettings.commissionPercentage,
-      });
+        updatedAt: new Date(),
+      }, { merge: true });
 
-      // Update notification settings
-      await updateDoc(doc(db, 'settings', 'notifications'), {
+      // Update notification settings (use setDoc with merge to create if not exists)
+      await setDoc(doc(db, 'settings', 'notifications'), {
         emailNotifications: notificationSettings.emailNotifications,
         orderNotifications: notificationSettings.orderNotifications,
         payoutNotifications: notificationSettings.payoutNotifications,
-      });
+        updatedAt: new Date(),
+      }, { merge: true });
 
       showToast('Settings updated successfully', 'success');
     } catch (error) {

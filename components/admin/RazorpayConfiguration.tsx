@@ -171,20 +171,32 @@ export default function RazorpayConfiguration({ onSave, loading, saving }: Razor
           <div className="relative">
             <input
               type={showSecret ? "text" : "password"}
-              value={displayKeySecret}
-              onChange={(e) => {
-                // Only allow editing if showing secret or no existing data
-                if (showSecret || !hasExistingData) {
-                  handleInputChange('keySecret', e.target.value);
+              value={showSecret ? settings.keySecret : displayKeySecret}
+              onChange={(e) => handleInputChange('keySecret', e.target.value)}
+              onFocus={() => {
+                // When focusing on a masked field, show the secret and clear it for new input
+                if (hasExistingData && !showSecret) {
+                  setShowSecret(true);
+                  handleInputChange('keySecret', '');
                 }
               }}
               placeholder="Enter your Razorpay Key Secret"
               className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
-              readOnly={hasExistingData && !showSecret}
             />
             <button
               type="button"
-              onClick={() => setShowSecret(!showSecret)}
+              onClick={() => {
+                setShowSecret(!showSecret);
+                // If hiding and there's existing data, keep the actual secret
+                if (showSecret && hasExistingData && !settings.keySecret) {
+                  // User cleared the field, so we need to reload
+                  RazorpayService.getRazorpaySettings().then(existingSettings => {
+                    if (existingSettings) {
+                      handleInputChange('keySecret', existingSettings.keySecret);
+                    }
+                  });
+                }
+              }}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
             >
               {showSecret ? (
@@ -195,7 +207,10 @@ export default function RazorpayConfiguration({ onSave, loading, saving }: Razor
             </button>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Keep this secret secure. Never share it publicly.
+            {hasExistingData && !showSecret 
+              ? 'Click the eye icon to view or edit the secret key'
+              : 'Keep this secret secure. Never share it publicly.'
+            }
           </p>
         </div>
 

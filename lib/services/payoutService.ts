@@ -29,10 +29,10 @@ export const getAllPayoutRequests = async (): Promise<PayoutRequest[]> => {
       snapshot.docs.map(async (docSnap) => {
         const data = docSnap.data();
         
-        // Get vendor name
+        // Get vendor name from vendors collection
         let vendorName = 'Unknown';
         if (data.vendorId) {
-          const vendorDoc = await getDoc(doc(db, 'users', data.vendorId));
+          const vendorDoc = await getDoc(doc(db, 'vendors', data.vendorId));
           if (vendorDoc.exists()) {
             vendorName = vendorDoc.data().name || 'Unknown';
           }
@@ -73,7 +73,7 @@ export const getPayoutRequestsByStatus = async (status: string): Promise<PayoutR
         
         let vendorName = 'Unknown';
         if (data.vendorId) {
-          const vendorDoc = await getDoc(doc(db, 'users', data.vendorId));
+          const vendorDoc = await getDoc(doc(db, 'vendors', data.vendorId));
           if (vendorDoc.exists()) {
             vendorName = vendorDoc.data().name || 'Unknown';
           }

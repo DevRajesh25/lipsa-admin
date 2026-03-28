@@ -19,6 +19,13 @@ export interface Vendor {
   totalProducts: number;
   totalOrders?: number;
   totalRevenue?: number;
+  bankDetails?: {
+    accountHolderName: string;
+    accountNumber: string;
+    bankName: string;
+    ifscCode: string;
+    branch?: string;
+  };
   createdAt: Date;
 }
 
@@ -50,6 +57,10 @@ export interface Order {
   customerName: string;
   vendors: string[];
   totalAmount: number;
+  productPrice?: number;
+  taxAmount?: number;
+  commissionAmount?: number;
+  vendorEarnings?: number;
   paymentStatus: 'pending' | 'paid' | 'failed';
   orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered';
   createdAt: Date;

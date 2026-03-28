@@ -105,7 +105,7 @@ export default function MobileSidebar() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-linear-to-r from-purple-500 to-blue-500 text-white rounded-xl shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl shadow-lg"
         aria-label="Toggle menu"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -130,10 +130,10 @@ export default function MobileSidebar() {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="lg:hidden fixed top-0 left-0 w-64 bg-linear-to-b from-gray-50 to-white min-h-screen p-6 flex flex-col z-40 shadow-2xl"
+            className="lg:hidden fixed top-0 left-0 w-64 bg-gradient-to-b from-gray-50 to-white min-h-screen p-6 flex flex-col z-40 shadow-2xl"
           >
             <div className="mb-10 mt-12">
-              <h1 className="text-2xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Admin Panel
               </h1>
               <p className="text-sm text-gray-500 mt-1">Multi-Vendor Marketplace</p>
@@ -157,7 +157,7 @@ export default function MobileSidebar() {
                       onClick={() => setIsOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 relative ${
                         isActive
-                          ? 'bg-linear-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30'
+                          ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30'
                           : 'text-gray-600 hover:bg-white hover:shadow-md'
                       }`}
                     >
@@ -180,7 +180,7 @@ export default function MobileSidebar() {
 
             <button
               onClick={handleLogout}
-              className="mt-auto flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg"
+              className="mt-auto flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg"
             >
               <LogOut className="w-5 h-5" />
               Logout

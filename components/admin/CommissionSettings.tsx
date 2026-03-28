@@ -72,7 +72,7 @@ export default function CommissionSettings() {
         className="bg-white rounded-2xl p-6 shadow-lg"
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="bg-linear-to-br from-orange-100 to-orange-200 rounded-full p-3">
+          <div className="bg-gradient-to-br from-orange-100 to-orange-200 rounded-full p-3">
             <Percent className="w-5 h-5 text-orange-600" />
           </div>
           <h3 className="text-lg font-bold text-gray-900">Commission Settings</h3>
@@ -99,7 +99,7 @@ export default function CommissionSettings() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full px-6 py-3 bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg hover:shadow-xl"
+            className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-lg hover:shadow-xl"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>

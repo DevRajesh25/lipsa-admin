@@ -54,11 +54,27 @@ export default function ReturnsPage() {
               }
             }
 
+            // Calculate refund amount from order if not present
+            let refundAmount = returnData.refundAmount || 0;
+            if (!returnData.refundAmount && returnData.orderId) {
+              try {
+                const orderDoc = await getDoc(doc(db, 'orders', returnData.orderId));
+                if (orderDoc.exists()) {
+                  const orderData = orderDoc.data();
+                  // Use totalAmount as refund amount (includes product price + tax)
+                  refundAmount = orderData.totalAmount || 0;
+                }
+              } catch (error) {
+                console.error('Error fetching order for refund amount:', error);
+              }
+            }
+
             return {
               id: returnDoc.id,
               ...returnData,
               customerName,
               productName,
+              refundAmount,
               createdAt: returnData.createdAt?.toDate() || new Date(),
             };
           })

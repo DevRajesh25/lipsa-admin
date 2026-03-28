@@ -38,7 +38,7 @@ export default function DashboardPage() {
         pendingProductsSnap,
         ordersSnap,
         pendingOrdersSnap,
-        paidOrdersSnap,
+        allOrdersSnap,
         commissionSnap
       ] = await Promise.all([
         getCountFromServer(collection(db, 'users')),
@@ -54,9 +54,7 @@ export default function DashboardPage() {
         getCountFromServer(
           query(collection(db, 'orders'), where('orderStatus', '==', 'pending'))
         ),
-        getDocs(
-          query(collection(db, 'orders'), where('paymentStatus', '==', 'paid'))
-        ),
+        getDocs(collection(db, 'orders')), // Get ALL orders to calculate revenue
         getDoc(doc(db, 'settings', 'commission'))
       ]);
 
@@ -69,12 +67,30 @@ export default function DashboardPage() {
       const totalOrders = ordersSnap.data().count;
       const pendingOrders = pendingOrdersSnap.data().count;
 
-      // Calculate total revenue from paid orders
+      // Calculate total revenue from ALL orders (not just paid)
+      // This ensures we show actual order data even if payment status isn't set
       let totalRevenue = 0;
-      paidOrdersSnap.forEach((doc) => {
+      let paidOrdersCount = 0;
+      let allOrdersCount = 0;
+      
+      allOrdersSnap.forEach((doc) => {
         const order = doc.data();
-        totalRevenue += order.totalAmount || 0;
+        const amount = order.totalAmount || 0;
+        
+        // Count all orders with amount > 0
+        if (amount > 0) {
+          totalRevenue += amount;
+          allOrdersCount++;
+          
+          // Also track specifically paid orders
+          if (order.paymentStatus === 'paid') {
+            paidOrdersCount++;
+          }
+        }
       });
+      
+      console.log(`📊 Revenue calculation: ${allOrdersCount} orders with total ₹${totalRevenue.toLocaleString('en-IN')}`);
+      console.log(`💳 Paid orders: ${paidOrdersCount} of ${allOrdersCount}`);
 
       // Fetch commission percentage from Firestore settings
       const commissionPercentage = commissionSnap.exists() 
@@ -244,7 +260,7 @@ export default function DashboardPage() {
         <AnalyticsCard title="Total Revenue" className="lg:col-span-2">
           <div className="mb-4">
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 ₹{(stats?.totalRevenue || 0).toLocaleString('en-IN')}
               </span>
               <span className="flex items-center text-green-600 text-sm font-semibold">
@@ -273,6 +289,7 @@ export default function DashboardPage() {
                     borderRadius: '12px', 
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' 
                   }}
+                  formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Revenue']}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
@@ -291,7 +308,7 @@ export default function DashboardPage() {
         <AnalyticsCard title="Orders Growth">
           {ordersGrowthData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={ordersGrowthData}>
+              <AreaChart data={ordersGrowthData}>
                 <defs>
                   <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -310,7 +327,7 @@ export default function DashboardPage() {
                   }}
                 />
                 <Area type="monotone" dataKey="orders" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorOrders)" />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center h-75 text-gray-500">

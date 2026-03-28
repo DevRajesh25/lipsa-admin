@@ -8,7 +8,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, Users, Package, ShoppingCart, Store, LogOut, 
-  FolderTree, RotateCcw, Tag, Image, DollarSign, BarChart3, Settings, Video 
+  FolderTree, RotateCcw, Tag, Image, DollarSign, Settings, Video 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -24,7 +24,6 @@ const navItems = [
   { href: '/admin/banners', label: 'Banners', icon: Image, countKey: null },
   { href: '/admin/influencer-videos', label: 'Influencer Videos', icon: Video, countKey: 'pendingVideos' },
   { href: '/admin/payouts', label: 'Payouts', icon: DollarSign, countKey: 'pendingPayouts' },
-  { href: '/admin/reports', label: 'Reports', icon: BarChart3, countKey: null },
   { href: '/admin/settings', label: 'Settings', icon: Settings, countKey: null },
 ];
 
@@ -101,9 +100,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-linear-to-b from-gray-50 to-white h-screen p-6 flex flex-col border-r border-gray-100">
+    <aside className="w-64 bg-gradient-to-b from-gray-50 to-white h-screen p-6 flex flex-col border-r border-gray-100">
       <div className="mb-10 shrink-0">
-        <h1 className="text-2xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           Admin Panel
         </h1>
         <p className="text-sm text-gray-500 mt-1">Multi-Vendor Marketplace</p>
@@ -126,7 +125,7 @@ export default function Sidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 relative ${
                   isActive
-                    ? 'bg-linear-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30'
+                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg shadow-purple-500/30'
                     : 'text-gray-600 hover:bg-white hover:shadow-md'
                 }`}
               >
@@ -149,7 +148,7 @@ export default function Sidebar() {
 
       <button
         onClick={handleLogout}
-        className="mt-6 shrink-0 flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+        className="mt-6 shrink-0 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
       >
         <LogOut className="w-5 h-5" />
         Logout

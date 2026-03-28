@@ -92,9 +92,9 @@ export const getMonthlyRevenue = async (months: number = 6) => {
     const now = new Date();
     const startDate = new Date(now.getFullYear(), now.getMonth() - months, 1);
     
+    // Get ALL orders (not just delivered) to show revenue data
     const ordersQuery = query(
       collection(db, 'orders'),
-      where('orderStatus', '==', 'delivered'),
       where('createdAt', '>=', Timestamp.fromDate(startDate)),
       orderBy('createdAt', 'asc')
     );
@@ -113,16 +113,18 @@ export const getMonthlyRevenue = async (months: number = 6) => {
       const data = doc.data();
       const date = data.createdAt?.toDate() || new Date();
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const amount = data.totalAmount || 0;
       
-      if (monthlyData.hasOwnProperty(monthKey)) {
-        monthlyData[monthKey] += data.totalAmount || 0;
+      // Only count orders with actual amounts
+      if (monthlyData.hasOwnProperty(monthKey) && amount > 0) {
+        monthlyData[monthKey] += amount;
       }
     });
     
     // Convert to array format for charts
     return Object.entries(monthlyData).map(([month, revenue]) => ({
       month,
-      revenue,
+      revenue: Number(revenue), // Ensure it's a number, not a Timestamp
     }));
   } catch (error) {
     console.error('Error fetching monthly revenue:', error);

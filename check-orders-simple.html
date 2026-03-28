@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Check Orders Data</title>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    // Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function checkOrders() {
+      const output = document.getElementById('output');
+      output.innerHTML = '<p>🔍 Checking orders data...</p>';
+      
+      try {
+        const ordersSnapshot = await getDocs(collection(db, 'orders'));
+        
+        let html = `<h2>📊 Total orders: ${ordersSnapshot.size}</h2>`;
+        
+        if (ordersSnapshot.empty) {
+          html += '<p>❌ No orders found</p>';
+          output.innerHTML = html;
+          return;
+        }
+        
+        let totalRevenue = 0;
+        let paidOrders = 0;
+        let pendingOrders = 0;
+        let failedOrders = 0;
+        
+        html += '<table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">';
+        html += '<tr><th>Order ID</th><th>Payment Status</th><th>Order Status</th><th>Total Amount</th><th>Created</th></tr>';
+        
+        ordersSnapshot.forEach((doc) => {
+          const order = doc.data();
+          const orderId = doc.id.substring(0, 12);
+          const paymentStatus = order.paymentStatus || 'unknown';
+          const orderStatus = order.orderStatus || 'unknown';
+          const totalAmount = order.totalAmount || 0;
+          const createdAt = order.createdAt?.toDate?.() || 'N/A';
+          
+          html += `<tr>
+            <td>${orderId}...</td>
+            <td style="color: ${paymentStatus === 'paid' ? 'green' : paymentStatus === 'failed' ? 'red' : 'orange'}">${paymentStatus}</td>
+            <td>${orderStatus}</td>
+            <td>₹${totalAmount.toLocaleString('en-IN')}</td>
+            <td>${createdAt}</td>
+          </tr>`;
+          
+          if (paymentStatus === 'paid') {
+            paidOrders++;
+            totalRevenue += totalAmount;
+          } else if (paymentStatus === 'pending') {
+            pendingOrders++;
+          } else if (paymentStatus === 'failed') {
+            failedOrders++;
+          }
+        });
+        
+        html += '</table>';
+        
+        html += `<h2>📈 Summary:</h2>`;
+        html += `<p>Total Orders: ${ordersSnapshot.size}</p>`;
+        html += `<p>Paid Orders: <strong style="color: green">${paidOrders}</strong></p>`;
+        html += `<p>Pending Orders: <strong style="color: orange">${pendingOrders}</strong></p>`;
+        html += `<p>Failed Orders: <strong style="color: red">${failedOrders}</strong></p>`;
+        html += `<p>💰 Total Revenue (from paid orders): <strong style="color: green; font-size: 24px">₹${totalRevenue.toLocaleString('en-IN')}</strong></p>`;
+        
+        if (paidOrders === 0) {
+          html += `<div style="background: #fff3cd; padding: 20px; border-left: 4px solid #ffc107; margin-top: 20px;">`;
+          html += `<h3>⚠️ WARNING: No orders with paymentStatus="paid" found!</h3>`;
+          html += `<p>This is why the dashboard shows ₹0 revenue.</p>`;
+          html += `<p><strong>To fix this:</strong></p>`;
+          html += `<ol>`;
+          html += `<li>Update existing orders to have paymentStatus="paid"</li>`;
+          html += `<li>Or ensure new orders are created with proper payment status</li>`;
+          html += `</ol>`;
+          html += `</div>`;
+        }
+        
+        output.innerHTML = html;
+        
+      } catch (error) {
+        output.innerHTML = `<p style="color: red">❌ Error: ${error.message}</p>`;
+        console.error(error);
+      }
+    }
+
+    window.addEventListener('load', checkOrders);
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    table {
+      margin: 20px 0;
+    }
+    th {
+      background: #8b5cf6;
+      color: white;
+      padding: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Orders Data Check</h1>
+  <div id="output">Loading...</div>
+</body>
+</html>

@@ -44,6 +44,16 @@ export const getAllReturns = async (): Promise<Return[]> => {
           }
         }
         
+        // Calculate refund amount from order if not present
+        let refundAmount = data.refundAmount || 0;
+        if (!data.refundAmount && data.orderId) {
+          const orderDoc = await getDoc(doc(db, 'orders', data.orderId));
+          if (orderDoc.exists()) {
+            const orderData = orderDoc.data();
+            refundAmount = orderData.totalAmount || 0;
+          }
+        }
+        
         return {
           id: docSnap.id,
           orderId: data.orderId,
@@ -53,7 +63,7 @@ export const getAllReturns = async (): Promise<Return[]> => {
           productName,
           reason: data.reason,
           status: data.status || 'pending',
-          refundAmount: data.refundAmount || 0,
+          refundAmount,
           createdAt: data.createdAt?.toDate() || new Date(),
         } as Return;
       })
@@ -96,6 +106,16 @@ export const getReturnsByStatus = async (status: string): Promise<Return[]> => {
           }
         }
         
+        // Calculate refund amount from order if not present
+        let refundAmount = data.refundAmount || 0;
+        if (!data.refundAmount && data.orderId) {
+          const orderDoc = await getDoc(doc(db, 'orders', data.orderId));
+          if (orderDoc.exists()) {
+            const orderData = orderDoc.data();
+            refundAmount = orderData.totalAmount || 0;
+          }
+        }
+        
         return {
           id: docSnap.id,
           orderId: data.orderId,
@@ -105,7 +125,7 @@ export const getReturnsByStatus = async (status: string): Promise<Return[]> => {
           productName,
           reason: data.reason,
           status: data.status,
-          refundAmount: data.refundAmount || 0,
+          refundAmount,
           createdAt: data.createdAt?.toDate() || new Date(),
         } as Return;
       })

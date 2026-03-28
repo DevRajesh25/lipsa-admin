@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { RazorpaySettings } from '@/types';
 
@@ -50,12 +50,12 @@ export class RazorpayService {
         throw new Error('Invalid Razorpay Key ID format. Must start with "rzp_"');
       }
 
-      await updateDoc(doc(db, this.COLLECTION, this.DOC_ID), {
+      await setDoc(doc(db, this.COLLECTION, this.DOC_ID), {
         keyId: settings.keyId.trim(),
         keySecret: settings.keySecret.trim(),
         isActive: settings.isActive,
         updatedAt: serverTimestamp(),
-      });
+      }, { merge: true });
     } catch (error) {
       console.error('Error updating Razorpay settings:', error);
       throw error;

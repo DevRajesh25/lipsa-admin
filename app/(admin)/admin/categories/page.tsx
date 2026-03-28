@@ -129,7 +129,7 @@ export default function CategoriesPage() {
               setFormData({ name: '', description: '', imageUrl: '' });
               setShowModal(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg font-medium"
           >
             <Plus className="w-4 h-4" />
             Add Category
@@ -139,7 +139,7 @@ export default function CategoriesPage() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-linear-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Image</th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Name</th>
@@ -203,7 +203,7 @@ export default function CategoriesPage() {
                             setFormData({ name: '', description: '', imageUrl: '' });
                             setShowModal(true);
                           }}
-                          className="px-4 py-2 bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg transition-all font-medium"
+                          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg transition-all font-medium"
                         >
                           Add First Category
                         </button>
@@ -266,7 +266,7 @@ export default function CategoriesPage() {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg transition-all font-medium"
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-lg transition-all font-medium"
                 >
                   {editingCategory ? 'Update' : 'Create'}
                 </button>

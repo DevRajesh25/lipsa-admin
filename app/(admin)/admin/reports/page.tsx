@@ -111,17 +111,16 @@ export default function ReportsPage() {
         getCountFromServer(query(collection(db, 'orders'), where('orderStatus', '==', 'pending')))
       ]);
 
-      // STEP 3: Optimized queries for revenue calculations (only paid orders)
+      // STEP 3: Optimized queries for revenue calculations (ALL orders with amounts)
       const startDate = getDateRange();
-      const paidOrdersQuery = query(
+      const allOrdersQuery = query(
         collection(db, 'orders'),
-        where('paymentStatus', '==', 'paid'),
         orderBy('createdAt', 'desc')
       );
 
       // STEP 4: Parallel queries for detailed data (only when needed)
-      const [paidOrdersSnap, newCustomersSnap, categoriesSnap, vendorsSnap] = await Promise.all([
-        getDocs(paidOrdersQuery), // Only paid orders for revenue calculations
+      const [allOrdersSnap, newCustomersSnap, categoriesSnap, vendorsSnap] = await Promise.all([
+        getDocs(allOrdersQuery), // Get ALL orders to calculate revenue properly
         getDocs(query(
           collection(db, 'users'),
           where('role', '==', 'customer'),
@@ -133,47 +132,58 @@ export default function ReportsPage() {
 
       // STEP 5: Process revenue data efficiently
       let totalRevenue = 0;
+      let ordersWithAmountCount = 0;
       let paidOrdersCount = 0;
       const monthlyRevenue: { [key: string]: { revenue: number; orders: number; customers: Set<string> } } = {};
       const vendorRevenue: { [key: string]: { revenue: number; orders: number; name: string } } = {};
       
-      // Process only paid orders (already filtered by query)
-      paidOrdersSnap.forEach((doc) => {
+      // Process ALL orders (not just paid ones)
+      allOrdersSnap.forEach((doc) => {
         const order = doc.data();
         const orderDate = order.createdAt?.toDate() || new Date();
         const orderAmount = order.totalAmount || 0;
         
-        totalRevenue += orderAmount;
-        paidOrdersCount++;
-        
-        // Monthly data (only for selected date range)
-        if (orderDate >= startDate) {
-          const monthKey = orderDate.toLocaleDateString('en-US', { month: 'short' });
-          if (!monthlyRevenue[monthKey]) {
-            monthlyRevenue[monthKey] = { revenue: 0, orders: 0, customers: new Set() };
+        // Only count orders with actual amounts
+        if (orderAmount > 0) {
+          totalRevenue += orderAmount;
+          ordersWithAmountCount++;
+          
+          // Track paid orders separately
+          if (order.paymentStatus === 'paid') {
+            paidOrdersCount++;
           }
-          monthlyRevenue[monthKey].revenue += orderAmount;
-          monthlyRevenue[monthKey].orders += 1;
-          monthlyRevenue[monthKey].customers.add(order.customerId);
-        }
         
-        // Vendor revenue (distribute evenly among vendors)
-        if (order.vendors && order.vendors.length > 0) {
-          const revenuePerVendor = orderAmount / order.vendors.length;
-          order.vendors.forEach((vendorId: string) => {
-            if (!vendorRevenue[vendorId]) {
-              vendorRevenue[vendorId] = { revenue: 0, orders: 0, name: '' };
+          // Monthly data (only for selected date range)
+          if (orderDate >= startDate) {
+            const monthKey = orderDate.toLocaleDateString('en-US', { month: 'short' });
+            if (!monthlyRevenue[monthKey]) {
+              monthlyRevenue[monthKey] = { revenue: 0, orders: 0, customers: new Set() };
             }
-            vendorRevenue[vendorId].revenue += revenuePerVendor;
-            vendorRevenue[vendorId].orders += 1;
-          });
+            monthlyRevenue[monthKey].revenue += orderAmount;
+            monthlyRevenue[monthKey].orders += 1;
+            monthlyRevenue[monthKey].customers.add(order.customerId);
+          }
+          
+          // Vendor revenue (distribute evenly among vendors)
+          if (order.vendors && order.vendors.length > 0) {
+            const revenuePerVendor = orderAmount / order.vendors.length;
+            order.vendors.forEach((vendorId: string) => {
+              if (!vendorRevenue[vendorId]) {
+                vendorRevenue[vendorId] = { revenue: 0, orders: 0, name: '' };
+              }
+              vendorRevenue[vendorId].revenue += revenuePerVendor;
+              vendorRevenue[vendorId].orders += 1;
+            });
+          }
         }
       });
 
       // STEP 6: Calculate derived metrics
       const platformCommission = totalRevenue * (currentCommissionPercentage / 100);
-      const avgOrderValue = paidOrdersCount > 0 ? totalRevenue / paidOrdersCount : 0;
+      const avgOrderValue = ordersWithAmountCount > 0 ? totalRevenue / ordersWithAmountCount : 0;
       const newCustomersThisMonth = newCustomersSnap.size;
+      
+      console.log(`📊 Revenue Stats: Total=₹${totalRevenue.toLocaleString('en-IN')}, Orders=${ordersWithAmountCount}, Paid=${paidOrdersCount}`);
 
       // STEP 7: Set basic stats (using aggregate counts)
       setStats({

@@ -183,7 +183,7 @@ export default function ProductsPage() {
               onClick={() => setStatusFilter(status)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 statusFilter === status
-                  ? 'bg-linear-to-r from-purple-500 to-blue-500 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -196,7 +196,7 @@ export default function ProductsPage() {
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-linear-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Product Name</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Vendor</th>
@@ -243,7 +243,7 @@ export default function ProductsPage() {
                         )}
                         <button
                           onClick={() => openDeleteModal(product.id, product.name)}
-                          className="px-3 py-1 bg-linear-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white text-xs rounded-lg transition-all shadow-md hover:shadow-lg font-medium"
+                          className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white text-xs rounded-lg transition-all shadow-md hover:shadow-lg font-medium"
                         >
                           Delete
                         </button>
